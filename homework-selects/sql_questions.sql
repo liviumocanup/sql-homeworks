@@ -193,7 +193,7 @@ SELECT EMPLOYEE_ID,
        CASE JOB_ID
            WHEN 'ST_MAN' THEN 'SALESMAN'
            WHEN 'IT_PROG' THEN 'DEVELOPER'
-           ELSE JOB_ID END     AS JOB_ID
+           ELSE JOB_ID END AS JOB_ID
 FROM EMPLOYEES;
 
 --32. the employee id, name ( first name and last name ), salary and the SalaryStatus column with a title HIGH and LOW respectively for those employees whose salary is more than and less than the average salary of all employees.
@@ -203,20 +203,20 @@ SELECT EMPLOYEE_ID,
        CASE
            WHEN SALARY > (SELECT AVG(SALARY) FROM EMPLOYEES) THEN 'HIGH'
            ELSE 'LOW'
-           END                 AS SalaryStatus
+           END AS SalaryStatus
 FROM EMPLOYEES;
 
 --33. the employee id, name ( first name and last name ), SalaryDrawn, AvgCompare (salary - the average salary of all employees)
 -- and the SalaryStatus column with a title HIGH and LOW respectively for those employees whose salary is more than and less than
 -- the average salary of all employees.
 SELECT EMPLOYEE_ID,
-       FIRST_NAME || LAST_NAME                      as NAME,
-       SALARY                                       as SalaryDrawn,
+       FIRST_NAME || LAST_NAME as NAME,
+       SALARY as SalaryDrawn,
        SALARY - (select avg(SALARY) from EMPLOYEES) as AvgCompare,
        CASE
            WHEN SALARY > (SELECT AVG(SALARY) FROM EMPLOYEES) THEN 'HIGH'
            ELSE 'LOW'
-           END                                      AS SalaryStatus
+           END AS SalaryStatus
 FROM EMPLOYEES;
 
 --34. all the employees who earn more than the average and who work in any of the IT departments.
@@ -241,26 +241,26 @@ WHERE MANAGER_ID IN (SELECT e.EMPLOYEE_ID
                        WHERE COUNTRY_ID = 'US');
 
 --37. the names of all employees whose salary is greater than 50% of their department’s total salary bill.
-SELECT FIRST_NAME, LAST_NAME
+SELECT FIRST_NAME || LAST_NAME as NAME
 FROM EMPLOYEES e
 WHERE SALARY > (SELECT SUM(SALARY) * 0.5 FROM EMPLOYEES e1 WHERE e.DEPARTMENT_ID = e1.DEPARTMENT_ID);
 
 --38. the employee id, name ( first name and last name ), salary, department name and city for all
 --the employees who gets the salary as the salary earn by the employee which is maximum within the joining person January 1st, 2002 and December 31st, 2003.  
-SELECT EMPLOYEE_ID, FIRST_NAME, LAST_NAME, SALARY, DEPARTMENT_NAME, CITY
+SELECT EMPLOYEE_ID, FIRST_NAME || LAST_NAME as NAME, SALARY, DEPARTMENT_NAME, CITY
 FROM EMPLOYEES e
          INNER JOIN DEPARTMENTS d on d.DEPARTMENT_ID = e.DEPARTMENT_ID
          INNER JOIN LOCATIONS L on d.LOCATION_ID = l.LOCATION_ID
 WHERE SALARY = (SELECT MAX(SALARY) FROM EMPLOYEES WHERE HIRE_DATE BETWEEN '01-jan-2002' AND '31-dec-2003');
 
 --39. the first and last name, salary, and department ID for all those employees who earn more than the average salary and arrange the list in descending order on salary.
-SELECT FIRST_NAME, LAST_NAME, SALARY, DEPARTMENT_ID
+SELECT FIRST_NAME || LAST_NAME as NAME, SALARY, DEPARTMENT_ID
 FROM EMPLOYEES
 WHERE SALARY > (SELECT AVG(SALARY) FROM EMPLOYEES)
 ORDER BY SALARY DESC;
 
 --40. the first and last name, salary, and department ID for those employees who earn more than the maximum salary of a department which ID is 40.
-SELECT FIRST_NAME, LAST_NAME, SALARY, DEPARTMENT_ID
+SELECT FIRST_NAME || LAST_NAME as NAME, SALARY, DEPARTMENT_ID
 FROM EMPLOYEES
 WHERE SALARY > ALL (SELECT SALARY
                     FROM EMPLOYEES
@@ -272,37 +272,37 @@ FROM DEPARTMENTS
 WHERE LOCATION_ID = (SELECT LOCATION_ID FROM DEPARTMENTS WHERE DEPARTMENT_ID = 30);
 
 --42. the first and last name, salary, and department ID for all those employees who work in that department where the employee works who hold the ID 201.
-SELECT FIRST_NAME, LAST_NAME, SALARY, DEPARTMENT_ID
+SELECT FIRST_NAME || LAST_NAME as NAME, SALARY, DEPARTMENT_ID
 FROM EMPLOYEES
 WHERE DEPARTMENT_ID = (SELECT DEPARTMENT_ID FROM EMPLOYEES WHERE EMPLOYEE_ID = 201);
 
 --43. the first and last name, salary, and department ID for those employees whose salary is equal to the salary of the employee who works in that department which ID is 40.
-SELECT FIRST_NAME, LAST_NAME, SALARY, DEPARTMENT_ID
+SELECT FIRST_NAME || LAST_NAME as NAME, SALARY, DEPARTMENT_ID
 FROM EMPLOYEES
 WHERE SALARY = (SELECT SALARY FROM EMPLOYEES WHERE DEPARTMENT_ID = 40);
 
 --44. the first and last name, salary, and department ID for those employees who earn more than the minimum salary of a department which ID is 40.
-SELECT FIRST_NAME, LAST_NAME, SALARY, DEPARTMENT_ID
+SELECT FIRST_NAME || LAST_NAME as NAME, SALARY, DEPARTMENT_ID
 FROM EMPLOYEES
 WHERE SALARY > (SELECT MIN(SALARY)
                 FROM EMPLOYEES
                 WHERE DEPARTMENT_ID = 40);
 
 --45. the first and last name, salary, and department ID for those employees who earn less than the minimum salary of a department which ID is 70.
-SELECT FIRST_NAME, LAST_NAME, SALARY, DEPARTMENT_ID
+SELECT FIRST_NAME || LAST_NAME as NAME, SALARY, DEPARTMENT_ID
 FROM EMPLOYEES
 WHERE SALARY < (SELECT MIN(SALARY)
                 FROM EMPLOYEES
                 WHERE DEPARTMENT_ID = 70);
 
 --46. the first and last name, salary, and department ID for those employees who earn less than the average salary, and also work at the department where the employee Laura is working as a first name holder.
-SELECT FIRST_NAME, LAST_NAME, SALARY, DEPARTMENT_ID
+SELECT FIRST_NAME || LAST_NAME as NAME, SALARY, DEPARTMENT_ID
 FROM EMPLOYEES
 WHERE SALARY < (SELECT AVG(SALARY) FROM EMPLOYEES)
   AND DEPARTMENT_ID = (SELECT DEPARTMENT_ID FROM EMPLOYEES WHERE FIRST_NAME = 'Laura');
 
 --47. the full name (first and last name) of manager who is supervising 4 or more employees.
-SELECT FIRST_NAME, LAST_NAME
+SELECT FIRST_NAME || LAST_NAME as NAME
 FROM EMPLOYEES
 WHERE EMPLOYEE_ID = ANY (SELECT MANAGER_ID FROM EMPLOYEES GROUP BY MANAGER_ID HAVING COUNT(*) >= 4);
 
@@ -320,6 +320,6 @@ FROM EMPLOYEES
 WHERE SALARY = (SELECT min(SALARY) FROM EMPLOYEES WHERE SALARY > (SELECT min(SALARY) FROM EMPLOYEES));
 
 --50. the department ID, full name (first and last name), salary for those employees who is highest salary drawar in a department.
-SELECT DEPARTMENT_ID, FIRST_NAME, LAST_NAME, SALARY
+SELECT DEPARTMENT_ID, FIRST_NAME || LAST_NAME as NAME, SALARY
 FROM EMPLOYEES e
 WHERE SALARY = (SELECT max(SALARY) FROM EMPLOYEES WHERE e.DEPARTMENT_ID = DEPARTMENT_ID);

@@ -8,8 +8,8 @@ FROM employees
 -- 2. the first and last name, department, city, and state province for each employee.
 SELECT FIRST_NAME, LAST_NAME, DEPARTMENT_NAME, CITY, STATE_PROVINCE
 FROM EMPLOYEES
-         INNER JOIN DEPARTMENTS USING (DEPARTMENT_ID)
-         INNER JOIN LOCATIONS USING (LOCATION_ID);
+         LEFT JOIN DEPARTMENTS USING (DEPARTMENT_ID)
+         LEFT JOIN LOCATIONS USING (LOCATION_ID);
 
 -- 3. the first name, last name, department number and department name, for all employees for departments 80 or 40.
 SELECT FIRST_NAME, LAST_NAME, DEPARTMENT_ID, DEPARTMENT_NAME
@@ -32,7 +32,7 @@ WHERE SALARY < (SELECT SALARY FROM EMPLOYEES WHERE EMPLOYEE_ID = 182);
 -- 6. the first name of all employees including the first name of their manager.
 SELECT e.FIRST_NAME, m.FIRST_NAME
 from EMPLOYEES e
-         INNER JOIN EMPLOYEES m on m.EMPLOYEE_ID = e.MANAGER_ID;
+         LEFT JOIN EMPLOYEES m on m.EMPLOYEE_ID = e.MANAGER_ID;
 
 -- 7. the first name of all employees and the first name of their manager including those who does not working under any manager.
 SELECT e.FIRST_NAME, m.FIRST_NAME
@@ -52,13 +52,13 @@ WHERE DEPARTMENT_ID IN (SELECT DEPARTMENT_ID FROM EMPLOYEES WHERE LAST_NAME = 'T
 --10. the department name and number of employees in each of the department.
 SELECT DEPARTMENT_NAME, COUNT(EMPLOYEE_ID)
 FROM DEPARTMENTS
-         LEFT JOIN EMPLOYEES e USING (DEPARTMENT_ID)
+         LEFT JOIN EMPLOYEES USING (DEPARTMENT_ID)
 GROUP BY DEPARTMENT_NAME;
 
 --11. the name of the department, average salary and number of employees working in that department who got commission.
 SELECT DEPARTMENT_NAME, AVG(SALARY), COUNT(EMPLOYEE_ID)
 FROM DEPARTMENTS
-         INNER JOIN EMPLOYEES D USING (DEPARTMENT_ID)
+         INNER JOIN EMPLOYEES USING (DEPARTMENT_ID)
 WHERE COMMISSION_PCT IS NOT NULL
 GROUP BY DEPARTMENT_NAME;
 
@@ -84,27 +84,26 @@ SELECT e.EMPLOYEE_ID, j.JOB_TITLE, h.END_DATE - h.START_DATE
 FROM JOBS j
          INNER JOIN JOB_HISTORY h USING (JOB_ID)
          INNER JOIN EMPLOYEES e on h.EMPLOYEE_ID = e.EMPLOYEE_ID
-         INNER JOIN DEPARTMENTS d on e.DEPARTMENT_ID = d.DEPARTMENT_ID and d.DEPARTMENT_ID = 80;
-
+WHERE e.DEPARTMENT_ID = 80;
 
 --15. the name ( first name and last name ) for those employees who gets more salary than the employee whose ID is 163.
-SELECT FIRST_NAME, LAST_NAME
+SELECT FIRST_NAME || LAST_NAME as NAME
 FROM EMPLOYEES
 WHERE SALARY > (SELECT SALARY FROM EMPLOYEES WHERE EMPLOYEE_ID = 163);
 
 --16. the employee id, employee name (first name and last name ) for all employees who earn more than the average salary.
-SELECT EMPLOYEE_ID, FIRST_NAME, LAST_NAME
+SELECT EMPLOYEE_ID, FIRST_NAME || LAST_NAME as NAME
 FROM EMPLOYEES
 WHERE SALARY > (SELECT AVG(SALARY) FROM EMPLOYEES);
 
 
 --17. the employee name ( first name and last name ), employee id and salary of all employees who report to Payam.
-SELECT FIRST_NAME, LAST_NAME, EMPLOYEE_ID, SALARY
+SELECT FIRST_NAME || LAST_NAME as NAME, EMPLOYEE_ID, SALARY
 FROM EMPLOYEES
 WHERE MANAGER_ID = (SELECT EMPLOYEE_ID FROM EMPLOYEES WHERE FIRST_NAME = 'Payam');
 
 --18. the department number, name ( first name and last name ), job and department name for all employees in the Finance department.
-SELECT DEPARTMENT_ID, FIRST_NAME, LAST_NAME, JOB_TITLE, DEPARTMENT_NAME
+SELECT DEPARTMENT_ID, FIRST_NAME || LAST_NAME as NAME, JOB_TITLE, DEPARTMENT_NAME
 FROM EMPLOYEES
          INNER JOIN DEPARTMENTS USING (DEPARTMENT_ID)
          INNER JOIN JOBS USING (JOB_ID)
@@ -134,40 +133,40 @@ FROM EMPLOYEES
 WHERE SALARY = (SELECT max(SALARY) FROM EMPLOYEES WHERE SALARY < (SELECT max(SALARY) FROM EMPLOYEES));
 
 --23. the employee name( first name and last name ) and hiredate for all employees in the same department as Clara. Exclude Clara.
-SELECT FIRST_NAME, LAST_NAME, HIRE_DATE
+SELECT FIRST_NAME || LAST_NAME as NAME, HIRE_DATE
 FROM EMPLOYEES
          INNER JOIN DEPARTMENTS USING (DEPARTMENT_ID)
 WHERE DEPARTMENT_ID = (SELECT DEPARTMENT_ID FROM EMPLOYEES WHERE FIRST_NAME = 'Clara')
   and FIRST_NAME <> 'Clara';
 
 --24. the employee number and name( first name and last name ) for all employees who work in a department with any employee whose name contains a T.
-SELECT EMPLOYEE_ID, FIRST_NAME, LAST_NAME
+SELECT EMPLOYEE_ID, FIRST_NAME || LAST_NAME as NAME
 FROM EMPLOYEES
          INNER JOIN DEPARTMENTS USING (DEPARTMENT_ID)
 WHERE DEPARTMENT_ID IN (SELECT DEPARTMENT_ID FROM EMPLOYEES WHERE FIRST_NAME LIKE '%T%' OR LAST_NAME LIKE '%T%');
 
 --25. full name(first and last name), job title, starting and ending date of last jobs for those employees with worked without a commission percentage.
-SELECT FIRST_NAME, LAST_NAME, JOB_TITLE, START_DATE, END_DATE, COMMISSION_PCT
+SELECT FIRST_NAME || LAST_NAME as NAME, JOB_TITLE, START_DATE, END_DATE, COMMISSION_PCT
 FROM EMPLOYEES
          INNER JOIN JOB_HISTORY USING (EMPLOYEE_ID)
          INNER JOIN JOBS J on J.JOB_ID = JOB_HISTORY.JOB_ID
 WHERE COMMISSION_PCT IS NULL;
 
 --26. the employee number, name( first name and last name ), and salary for all employees who earn more than the average salary and who work in a department with any employee with a J in their name.
-SELECT EMPLOYEE_ID, FIRST_NAME, LAST_NAME, SALARY
+SELECT EMPLOYEE_ID, FIRST_NAME || LAST_NAME as NAME, SALARY
 FROM EMPLOYEES
          INNER JOIN DEPARTMENTS USING (DEPARTMENT_ID)
 WHERE DEPARTMENT_ID IN (SELECT DEPARTMENT_ID FROM EMPLOYEES WHERE FIRST_NAME LIKE '%J%' OR LAST_NAME LIKE '%J%')
   AND SALARY > (SELECT AVG(SALARY) FROM EMPLOYEES);
 
 --27. the employee number, name( first name and last name ) and job title for all employees whose salary is smaller than any salary of those employees whose job title is MK_MAN.
-SELECT EMPLOYEE_ID, FIRST_NAME, LAST_NAME, JOB_TITLE
+SELECT EMPLOYEE_ID, FIRST_NAME || LAST_NAME as NAME, JOB_TITLE
 FROM EMPLOYEES
          LEFT JOIN JOBS USING (JOB_ID)
 WHERE SALARY < ANY (SELECT SALARY FROM EMPLOYEES WHERE JOB_ID LIKE '%MK_MAN%');
 
 --28. the employee number, name( first name and last name ) and job title for all employees whose salary is smaller than any salary of those employees whose job title is MK_MAN. Exclude Job title MK_MAN.
-SELECT EMPLOYEE_ID, FIRST_NAME, LAST_NAME, JOB_TITLE
+SELECT EMPLOYEE_ID, FIRST_NAME || LAST_NAME as NAME, JOB_TITLE
 FROM EMPLOYEES
          LEFT JOIN JOBS USING (JOB_ID)
 WHERE SALARY < ANY (SELECT SALARY FROM EMPLOYEES WHERE JOB_ID LIKE '%MK_MAN%')
@@ -180,7 +179,7 @@ FROM EMPLOYEES e
 WHERE END_DATE IS NULL;
 
 --30. the employee number, name( first name and last name ) and job title for all employees whose salary is more than any average salary of any department.
-SELECT e.EMPLOYEE_ID, FIRST_NAME, LAST_NAME, JOB_TITLE
+SELECT e.EMPLOYEE_ID, FIRST_NAME || LAST_NAME as NAME, JOB_TITLE
 FROM EMPLOYEES e
          INNER JOIN JOBS j on e.JOB_ID = j.JOB_ID
 WHERE SALARY > ANY (SELECT AVG(SALARY)
@@ -190,31 +189,28 @@ WHERE SALARY > ANY (SELECT AVG(SALARY)
 
 --31. the employee id, name ( first name and last name ) and the job id column with a modified title SALESMAN for those employees whose job title is ST_MAN and DEVELOPER for whose job title is IT_PROG.
 SELECT EMPLOYEE_ID,
-       FIRST_NAME,
-       LAST_NAME,
+       FIRST_NAME || LAST_NAME as NAME,
        CASE JOB_ID
            WHEN 'ST_MAN' THEN 'SALESMAN'
            WHEN 'IT_PROG' THEN 'DEVELOPER'
-           ELSE JOB_ID END AS JOB_ID
+           ELSE JOB_ID END     AS JOB_ID
 FROM EMPLOYEES;
 
 --32. the employee id, name ( first name and last name ), salary and the SalaryStatus column with a title HIGH and LOW respectively for those employees whose salary is more than and less than the average salary of all employees.
 SELECT EMPLOYEE_ID,
-       FIRST_NAME,
-       LAST_NAME,
+       FIRST_NAME || LAST_NAME as NAME,
        SALARY,
        CASE
            WHEN SALARY > (SELECT AVG(SALARY) FROM EMPLOYEES) THEN 'HIGH'
            ELSE 'LOW'
-           END AS SalaryStatus
+           END                 AS SalaryStatus
 FROM EMPLOYEES;
 
 --33. the employee id, name ( first name and last name ), SalaryDrawn, AvgCompare (salary - the average salary of all employees)
 -- and the SalaryStatus column with a title HIGH and LOW respectively for those employees whose salary is more than and less than
 -- the average salary of all employees.
 SELECT EMPLOYEE_ID,
-       FIRST_NAME,
-       LAST_NAME,
+       FIRST_NAME || LAST_NAME                      as NAME,
        SALARY                                       as SalaryDrawn,
        SALARY - (select avg(SALARY) from EMPLOYEES) as AvgCompare,
        CASE
@@ -238,9 +234,12 @@ WHERE SALARY > (SELECT SALARY FROM EMPLOYEES WHERE LAST_NAME = 'Ozer');
 --36. which employees have a manager who works for a department based in the US.
 SELECT e.*
 from EMPLOYEES e
-         INNER JOIN DEPARTMENTS d ON d.DEPARTMENT_ID = e.DEPARTMENT_ID
-         INNER JOIN LOCATIONS L ON d.LOCATION_ID = L.LOCATION_ID
-WHERE COUNTRY_ID = 'US';
+         INNER JOIN EMPLOYEES m on m.EMPLOYEE_ID = e.MANAGER_ID
+WHERE e.MANAGER_ID IN (SELECT e1.EMPLOYEE_ID
+                       FROM EMPLOYEES e1
+                                INNER JOIN DEPARTMENTS d ON d.DEPARTMENT_ID = e1.DEPARTMENT_ID
+                                INNER JOIN LOCATIONS L ON d.LOCATION_ID = L.LOCATION_ID
+                       WHERE COUNTRY_ID = 'US');
 
 --37. the names of all employees whose salary is greater than 50% of their department’s total salary bill.
 SELECT FIRST_NAME, LAST_NAME
@@ -313,7 +312,8 @@ SELECT j.*
 FROM JOBS j
          INNER JOIN EMPLOYEES e ON e.JOB_ID = j.JOB_ID
          INNER JOIN JOB_HISTORY h on e.EMPLOYEE_ID = h.EMPLOYEE_ID
-WHERE h.JOB_ID = 'SA_REP' AND h.END_DATE IS NOT NULL;
+WHERE h.JOB_ID = 'SA_REP'
+  AND h.END_DATE IS NOT NULL;
 
 --49. all the infromation about those employees who earn second lowest salary of all the employees.
 SELECT *

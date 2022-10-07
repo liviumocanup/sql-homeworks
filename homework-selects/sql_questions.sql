@@ -232,12 +232,11 @@ FROM EMPLOYEES
 WHERE SALARY > (SELECT SALARY FROM EMPLOYEES WHERE LAST_NAME = 'Ozer');
 
 --36. which employees have a manager who works for a department based in the US.
-SELECT e.*
-from EMPLOYEES e
-         INNER JOIN EMPLOYEES m on m.EMPLOYEE_ID = e.MANAGER_ID
-WHERE e.MANAGER_ID IN (SELECT e1.EMPLOYEE_ID
-                       FROM EMPLOYEES e1
-                                INNER JOIN DEPARTMENTS d ON d.DEPARTMENT_ID = e1.DEPARTMENT_ID
+SELECT *
+from EMPLOYEES
+WHERE MANAGER_ID IN (SELECT e.EMPLOYEE_ID
+                       FROM EMPLOYEES e
+                                INNER JOIN DEPARTMENTS d ON d.DEPARTMENT_ID = e.DEPARTMENT_ID
                                 INNER JOIN LOCATIONS L ON d.LOCATION_ID = L.LOCATION_ID
                        WHERE COUNTRY_ID = 'US');
 
